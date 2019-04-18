@@ -25,6 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('avatar')->default('')->comment('微信头像');
             $table->string('book_name')->default('')->comment('读过的书');
             $table->unsignedInteger('post_id')->default(0)->comment('书评 ID');
+            $table->string('openid')->default('')->comment('openid');
 
             $table->timestamps();
         });

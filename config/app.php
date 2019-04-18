@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'salt' => env('SALT'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
