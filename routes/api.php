@@ -29,4 +29,6 @@ Route::group(['namespace' => 'Api'], function () {
     Route::get('/user-info', 'UserController@info')->name('api.user-info');
     // 存储用户信息
     Route::post('/user-store', 'UserController@store')->name('api.user-store');
+
+    Route::get('/user', 'UserController@userInfo');
 });
