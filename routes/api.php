@@ -21,6 +21,9 @@ Route::group(['namespace' => 'Api'], function () {
     // 关于书评
     Route::get('/posts', 'PostController@index');
     Route::post('/post', 'PostController@store');
+    // 获取小程序码
+    Route::get('/qrcode', 'PostController@qrcode');
+
 
 
     // 关于用户
@@ -29,6 +32,7 @@ Route::group(['namespace' => 'Api'], function () {
     Route::get('/user-info', 'UserController@info')->name('api.user-info');
     // 存储用户信息
     Route::post('/user-store', 'UserController@store')->name('api.user-store');
-
     Route::get('/user', 'UserController@userInfo');
+
+
 });

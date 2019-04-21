@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Post;
+use App\Utils\Utils;
 use Illuminate\Http\Request;
 use App\Http\Resources\Post as PostResource;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -15,6 +17,9 @@ class PostController extends Controller
     {
         $posts = Post::orderBy('created_at', 'desc')->get();
 
+        foreach ($posts as &$post) {
+            $post->cover = config('edu.cdn_domain').'/'.$post->cover;
+        }
         return PostResource::collection($posts);
     }
 
@@ -48,5 +53,63 @@ class PostController extends Controller
             'code' => 200,
             'msg' => 'success'
         ];
+    }
+
+    public function qrcode(Request $request)
+    {
+        $res = $this->getToken();
+
+        $access_token = $res->access_token;
+$url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' . $access_token;
+
+// get cURL resource
+$ch = curl_init();
+
+// set url
+curl_setopt($ch, CURLOPT_URL, $url);
+
+// set method
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+
+// return the transfer as a string
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+// set headers
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Content-Type: application/json',
+]);
+
+// json body
+$json_array = [
+    'scene' => '1234'
+];
+$body = json_encode($json_array);
+
+// set body
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+
+// send the request and save response to $response
+$response = curl_exec($ch);
+
+// stop if fails
+if (!$response) {
+    die('Error: "' . curl_error($ch) . '" - Code: ' . curl_errno($ch));
+}
+
+//echo 'HTTP Status Code: ' . curl_getinfo($ch, CURLINFO_HTTP_CODE) . PHP_EOL;
+//echo 'Response Body: ' . $response . PHP_EOL;
+
+// close curl resource to free up system resources
+curl_close($ch);
+
+        $filename = "qrcode.png";
+        $bool = Storage::disk('oss')->put("qrcode.png", $response);
+        //file_put_contents("qrcode.png", $response);
+        if ($bool) {
+            //$base64_image ="data:image/jpeg;base64,".base64_encode( $response );
+            return $filename;
+
+        }
     }
 }
