@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Post;
+use App\User;
 use App\Utils\Utils;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Resources\Post as PostResource;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,10 +18,13 @@ class PostController extends Controller
     // 所有评论
     public function index()
     {
-        $posts = Post::orderBy('created_at', 'desc')->get();
+        $posts = Post::withCount('comments')->orderBy('likes', 'desc')->get();
 
         foreach ($posts as &$post) {
             $post->cover = config('edu.cdn_domain').'/'.$post->cover;
+            $post->summary = mb_strcut($post->content, 0, 50,'utf-8');
+            $user_id = $post->user_id;
+            $post->user_avatar = optional(User::where('id', $user_id)->first())->avatar;
         }
         return PostResource::collection($posts);
     }
@@ -108,8 +114,100 @@ curl_close($ch);
         //file_put_contents("qrcode.png", $response);
         if ($bool) {
             //$base64_image ="data:image/jpeg;base64,".base64_encode( $response );
-            return $filename;
+            return config('edu.cdn_domain').'/'.$filename;
 
+        }
+    }
+
+    // 点赞
+    public function like(Request $request)
+    {
+        $id = $request->id;
+        
+        $post = Post::where('id', $id)->first();
+
+        $post->likes += 1;
+
+        $post->save();
+
+        return [
+            'code' => 200,
+            'msg' => 'update success'
+        ];
+    }
+
+    // 我的所有书评
+    public function myPost(Request $request)
+    {
+        $token = $request->token;
+
+        // 从 Redis 中取出用户 ID
+        $user_id = Redis::get($token);
+        // 判断 token 是否过期
+        if (!$user_id) {
+            return [
+                'code' => 202,
+                'msg' => 'token expires'
+            ];
+        }
+        $posts = Post::withCount('comments')->where('user_id', $user_id)->get();
+
+        foreach ($posts as &$post) {
+            $post->cover = config('edu.cdn_domain').'/'.$post->cover;
+            $post->summary = mb_strcut($post->content, 0, 50,'utf-8');
+        }
+
+        return PostResource::collection($posts);
+    }
+
+    // 书评详情页
+    public function show(Request $request)
+    {
+        $post_id = $request->id;
+
+        $post = Post::withCount('comments')->where('id', $post_id)->first();
+
+        $user_id = $post->user_id;
+
+        $user = User::where('id', $user_id)->first();
+
+        $post->user_avatar = $user->avatar;
+
+        $post->cover = config('edu.cdn_domain').'/'.$post->cover;
+
+        $post->time = Carbon::createFromTimeStamp(strtotime($post->created_at))->diffForHumans();
+
+        return new PostResource($post);
+    }
+
+    // 根据书名搜索书评
+    public function search(Request $request)
+    {
+        $search = $request->search;
+
+        if ($search) {
+            $posts = Post::withCount('comments')->where('book_name', 'LIKE', "%$search%")->get();
+            //$posts = Post::where('book_name', 'like', $search)->get();
+            if (!empty($posts)) {
+
+                foreach($posts as &$post) {
+                    $post->cover = config('edu.cdn_domain').'/'.$post->cover;
+                    $post->summary = mb_strcut($post->content, 0, 50,'utf-8');
+                    $user_id = $post->user_id;
+                    $post->user_avatar = optional(User::where('id', $user_id)->first())->avatar;
+                }
+                return PostResource::collection($posts);
+            } else{
+                return [
+                    'code' => 404,
+                    'msg' => '没有搜索到'
+                ];
+            }
+        } else {
+            return [
+                'code' => 202,
+                'msg' => '不知道要搜索什么'
+            ];
         }
     }
 }

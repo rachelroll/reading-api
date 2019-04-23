@@ -15,7 +15,11 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::withCount('posts')->get();
+
+        //foreach($users as &$user) {
+        //    $user->avatar = config('edu.cdn_domain').'/'.$user->avatar;
+        //}
 
         return UserResource::collection($users);
     }
@@ -105,7 +109,7 @@ class UserController extends Controller
         ];
     }
 
-    // 获取用户信息
+    // 获取当前用户信息
     public function userInfo(Request $request)
     {
         $token = $request->token;
@@ -120,7 +124,6 @@ class UserController extends Controller
                 'msg' => 'token expires'
             ];
         }
-
         $user = User::withCount('posts')->where('id', $id)->first();
 
         return new UserResource($user);
