@@ -123,7 +123,7 @@ curl_close($ch);
     public function like(Request $request)
     {
         $id = $request->id;
-        
+
         $post = Post::where('id', $id)->first();
 
         $post->likes += 1;
