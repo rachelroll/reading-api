@@ -15,7 +15,7 @@ class User extends JsonResource
      */
     public function toArray($request)
     {
-        $age = Carbon::createFromTimeStamp(strtotime($this->created_at))->diffForHumans(null,true) ;
+        $age = Carbon::createFromTimeStamp(strtotime($this->created_at))->diffForHumans(null,true);
         return [
             'nickname' => $this->nickname,
             'avatar' => $this->avatar,
