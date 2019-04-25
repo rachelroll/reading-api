@@ -18,6 +18,6 @@ class Offline extends Model
     ];
 
     protected $fillable = [
-        'title', 'company', 'date', 'city', 'address', 'contact', 'phone', 'email', 'subject', 'user_id', 'description', 'cover'
+        'title', 'company', 'date', 'time','city', 'address', 'contact', 'phone', 'email', 'subject', 'user_id', 'description', 'cover'
     ];
 }

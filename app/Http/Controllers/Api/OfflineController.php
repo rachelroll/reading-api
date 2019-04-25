@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Offline;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use App\Http\Resources\Offline as OfflineResource;
 
@@ -16,6 +18,8 @@ class OfflineController extends Controller
         $file = $request->file('image', '');
         $cover = $this->upload($file, 500);
 
+        Log::info($cover);
+
         $token = $request->token;
         // 从 Redis 中取出用户 ID
         $user_id = Redis::get($token);
@@ -26,7 +30,7 @@ class OfflineController extends Controller
                 'msg' => 'token expires'
             ];
         }
-
+        Log::info(1);
         $city = json_encode($request->city);
 
         if($request->subject == Offline::SALON) {
@@ -36,17 +40,19 @@ class OfflineController extends Controller
         } else {
             $subject = 3;
         }
-
+        Log::info(1);
         Offline::create([
             'title' => $request->title,
             'company' => $request->company,
             'date' => $request->date,
+            'time' => $request->time,
             'city' => $city,
             'address' => $request->address,
             'contact' => $request->contact,
             'phone' => $request->phone,
             'email' => $request->email,
             'subject' => $subject,
+            'description' => $request->description,
             'user_id' => $user_id,
             'cover' => $cover
         ]);
@@ -57,14 +63,16 @@ class OfflineController extends Controller
         ];
     }
 
-    public function index(Request $request)
+    public function category(Request $request)
     {
         $category_id = $request->id;
-
+        // 按分类查询
         if ($category_id) {
             $meetings = Offline::where('subject', $category_id)->get();
         } else{
-            $meetings = Offline::orderBy('created_at', 'desc')->get();
+            // 查询所有数据
+            $meetings = Offline::all();
+
         }
 
         foreach ($meetings as $meeting) {
@@ -72,7 +80,6 @@ class OfflineController extends Controller
             $meeting->subject = Offline::CATEGORY[$category_id];
             $meeting->cover = 'https:'.config('edu.cdn_domain').'/'.$meeting->cover;
         }
-
 
         return OfflineResource::collection($meetings);
     }
@@ -89,5 +96,30 @@ class OfflineController extends Controller
         $meeting->cover = 'https:'.config('edu.cdn_domain').'/'.$meeting->cover;
 
         return new OfflineResource($meeting);
+    }
+
+    public function index()
+    {
+        $meetings = Offline::all();
+        foreach($meetings as $meeting) {
+            $dt = Carbon::createFromDate($meeting->date);
+            $month = $dt->month;
+            $day = $dt->day;
+
+            //$time = Carbon::createFromDate($meeting->time);
+            //$time->toDayDateTimeString();
+            //dd($time);
+            $array = [
+                $month => [
+                    $day => [
+                        'time' => $meeting->time,
+                        'title' => $meeting->title,
+                        'position' => $meeting->city,
+                        'desc' => $meeting->descripition,
+                    ]
+                ]
+            ];
+        }
+        return $array;
     }
 }
