@@ -42,4 +42,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Post::class);
     }
+
+    public function offlines()
+    {
+        return $this->hasMany(Offline::class);
+    }
 }

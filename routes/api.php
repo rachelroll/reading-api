@@ -47,4 +47,10 @@ Route::group(['namespace' => 'Api'], function () {
     Route::get('/comments', 'CommentController@index');
     Route::post('/comment', 'CommentController@store');
 
+    // 线下读书会
+    Route::post('/offline', 'OfflineController@store'); // 提交线下读书会
+    Route::get('/offlines/category', 'OfflineController@category'); // 按分类查询线下读书会列表
+    Route::get('/offline/show', 'OfflineController@show'); // 线下读书会详情页
+    Route::get('/offlines', 'OfflineController@index'); // 按分类查询线下读书会列表
+
 });
