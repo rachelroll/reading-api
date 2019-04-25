@@ -114,7 +114,7 @@ curl_close($ch);
         //file_put_contents("qrcode.png", $response);
         if ($bool) {
             //$base64_image ="data:image/jpeg;base64,".base64_encode( $response );
-            return config('edu.cdn_domain').'/'.$filename;
+            return 'https:'.config('edu.cdn_domain').'/'.$filename;
 
         }
     }

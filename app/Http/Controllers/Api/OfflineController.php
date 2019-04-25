@@ -106,9 +106,6 @@ class OfflineController extends Controller
             $month = $dt->month;
             $day = $dt->day;
 
-            //$time = Carbon::createFromDate($meeting->time);
-            //$time->toDayDateTimeString();
-            //dd($time);
             $array = [
                 $month => [
                     $day => [
