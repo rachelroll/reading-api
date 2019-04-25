@@ -105,7 +105,7 @@ class OfflineController extends Controller
         $offlines = DB::select('select *, MONTH(date) as month,DAY(date) as day  from offlines where YEAR(date) = ?  ',
             [2019]);
         $arr = [];
-        $offlines = collect($offlines)->groupBy('month')->map(function ($item, $key) use (&$arr) {
+        collect($offlines)->groupBy('month')->map(function ($item, $key) use (&$arr) {
             $item = collect($item)->groupBy('day');
             $tmp = [];
             $item->each(function ($it, $kk) use (&$tmp) {
@@ -115,7 +115,7 @@ class OfflineController extends Controller
                     $time_obj = Carbon::createFromTimeString($i->date . ' ' . $time);
 
                     $t = [
-                        'meridiem' => $time_obj->format('A') == 'AM' ? '上午' :'下午',
+                        'meridiem' => $time_obj->format('A') == 'AM' ? '上午' : '下午',
                         'time'     => $time_obj->format('H:i:s'),
                         'title'    => $i->subject,
                         'position' => $i->address,
