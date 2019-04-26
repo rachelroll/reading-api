@@ -22,7 +22,7 @@ class PostController extends Controller
 
         foreach ($posts as &$post) {
             $post->cover = config('edu.cdn_domain').'/'.$post->cover;
-            $post->summary = mb_strcut($post->content, 0, 50,'utf-8');
+
             $user_id = $post->user_id;
             $post->user_avatar = optional(User::where('id', $user_id)->first())->avatar;
         }
