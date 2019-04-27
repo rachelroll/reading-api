@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    // ËùÓÐÆÀÂÛ
+    // æ‰€æœ‰è¯„è®º
     public function index()
     {
         $posts = Post::withCount('comments')->orderBy('likes', 'desc')->get();
@@ -36,10 +36,10 @@ class PostController extends Controller
 
         $token = $request->token;
 
-        // ´Ó Redis ÖÐÈ¡³öÓÃ»§ ID
+        // ä»Ž Redis ä¸­å–å‡ºç”¨æˆ· ID
         $user_id = Redis::get($token);
 
-        // ÅÐ¶Ï token ÊÇ·ñ¹ýÆÚ
+        // åˆ¤æ–­ token æ˜¯å¦è¿‡æœŸ
         if (!$user_id) {
             return [
                 'code' => 202,
@@ -119,7 +119,7 @@ curl_close($ch);
         }
     }
 
-    // µãÔÞ
+    // ç‚¹èµž
     public function like(Request $request)
     {
         $id = $request->id;
@@ -136,14 +136,14 @@ curl_close($ch);
         ];
     }
 
-    // ÎÒµÄËùÓÐÊéÆÀ
+    // æˆ‘çš„æ‰€æœ‰ä¹¦è¯„
     public function myPost(Request $request)
     {
         $token = $request->token;
 
-        // ´Ó Redis ÖÐÈ¡³öÓÃ»§ ID
+        // ä»Ž Redis ä¸­å–å‡ºç”¨æˆ· ID
         $user_id = Redis::get($token);
-        // ÅÐ¶Ï token ÊÇ·ñ¹ýÆÚ
+        // åˆ¤æ–­ token æ˜¯å¦è¿‡æœŸ
         if (!$user_id) {
             return [
                 'code' => 202,
@@ -160,7 +160,7 @@ curl_close($ch);
         return PostResource::collection($posts);
     }
 
-    // ÊéÆÀÏêÇéÒ³
+    // ä¹¦è¯„è¯¦æƒ…é¡µ
     public function show(Request $request)
     {
         $post_id = $request->id;
@@ -180,33 +180,24 @@ curl_close($ch);
         return new PostResource($post);
     }
 
-    // ¸ù¾ÝÊéÃûËÑË÷ÊéÆÀ
+    // æ ¹æ®ä¹¦åæœç´¢ä¹¦è¯„
     public function search(Request $request)
     {
         $search = $request->search;
 
-        if ($search) {
-            $posts = Post::withCount('comments')->where('book_name', 'LIKE', "%$search%")->get();
-            //$posts = Post::where('book_name', 'like', $search)->get();
-            if (!empty($posts)) {
-
-                foreach($posts as &$post) {
-                    $post->cover = config('edu.cdn_domain').'/'.$post->cover;
-                    $post->summary = mb_strcut($post->content, 0, 50,'utf-8');
-                    $user_id = $post->user_id;
-                    $post->user_avatar = optional(User::where('id', $user_id)->first())->avatar;
-                }
-                return PostResource::collection($posts);
-            } else{
-                return [
-                    'code' => 404,
-                    'msg' => 'Ã»ÓÐËÑË÷µ½'
-                ];
+        $posts = Post::withCount('comments')->where('book_name', 'LIKE', "%$search%")->get();
+        //$posts = Post::where('book_name', 'like', $search)->get();
+        if (!empty($posts)) {
+            foreach($posts as &$post) {
+                $post->cover = config('edu.cdn_domain').'/'.$post->cover;
+                $user_id = $post->user_id;
+                $post->user_avatar = optional(User::where('id', $user_id)->first())->avatar;
             }
-        } else {
+            return PostResource::collection($posts);
+        } else{
             return [
-                'code' => 202,
-                'msg' => '²»ÖªµÀÒªËÑË÷Ê²Ã´'
+                'code' => 404,
+                'msg' => 'æ²¡æœ‰æœç´¢åˆ°'
             ];
         }
     }
