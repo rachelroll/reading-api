@@ -127,7 +127,7 @@ class OfflineController extends Controller
                 $tmp[ $kk ] = $c;
 
             });
-            $arr[ $key ] = $tmp;
+            $arr[ $key-1 ] = $tmp;
 
         });
 
