@@ -52,5 +52,5 @@ Route::group(['namespace' => 'Api'], function () {
     Route::get('/offlines/category', 'OfflineController@category'); // 按分类查询线下读书会列表
     Route::get('/offline/show', 'OfflineController@show'); // 线下读书会详情页
     Route::get('/offlines', 'OfflineController@index'); // 按分类查询线下读书会列表
-
+    Route::get('/myoffline', 'OfflineController@myOffline');
 });

@@ -135,4 +135,19 @@ class OfflineController extends Controller
 
 
     }
+
+    public function myOffline(Request $request)
+    {
+        $token = $request->token;
+
+        $user_id = Redis::get($token);
+
+        $myoffline = Offline::where('user_id', $user_id)->get();
+
+        return OfflineResource::collection($myoffline);
+    }
 }
+
+
+
+

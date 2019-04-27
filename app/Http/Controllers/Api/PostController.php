@@ -22,7 +22,7 @@ class PostController extends Controller
 
         foreach ($posts as &$post) {
             $post->cover = config('edu.cdn_domain').'/'.$post->cover;
-            $post->summary = mb_strcut($post->content, 0, 50,'utf-8');
+
             $user_id = $post->user_id;
             $post->user_avatar = optional(User::where('id', $user_id)->first())->avatar;
         }
@@ -114,7 +114,7 @@ curl_close($ch);
         //file_put_contents("qrcode.png", $response);
         if ($bool) {
             //$base64_image ="data:image/jpeg;base64,".base64_encode( $response );
-            return config('edu.cdn_domain').'/'.$filename;
+            return 'https:'.config('edu.cdn_domain').'/'.$filename;
 
         }
     }

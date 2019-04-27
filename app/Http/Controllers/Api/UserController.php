@@ -44,16 +44,12 @@ class UserController extends Controller
         $openid = $res->openid;
         $session_key = $res->session_key;
 
-        // 我的 openid
-        //$openid ="ofm0N5N2XB99Fo-xEuFNwPkk-Fys";
-
         // 根据 openid 查用户表里是否有这个用户
         $user_id = optional(User::where('openid', $openid)->first())->id;
         if ($user_id) {
             // 把用户 ID 加密生成 token
             $token = md5($user_id, config('salt'));
             Redis::set($token, $user_id); // 存入 session
-            Redis::expire($token, 7200); // 设置过期时间
 
             return $token;
         }
@@ -68,8 +64,7 @@ class UserController extends Controller
                 // 把用户 ID 加密生成 token
                 $token = md5($id, config('salt'));
 
-                Redis::set($token, 7200, $id); // 存入 session
-                Redis::expire($token, 7200);
+                Redis::set($token, $id); // 存入 session
                 return $token;
             }else {
                 return [
@@ -94,7 +89,7 @@ class UserController extends Controller
         if (!$id) {
             return [
                 'code' => 202,
-                'msg' => 'token expires'
+                'msg' => 'no token'
             ];
         }
 
