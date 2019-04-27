@@ -44,7 +44,7 @@ class OfflineController extends Controller
             'company'     => $request->company,
             'date'        => $request->date,
             'time'        => $request->time,
-            'city'        => $request->city,
+            'city'        => json_encode($request->city),
             'address'     => $request->address,
             'contact'     => $request->contact,
             'phone'       => $request->phone,
@@ -113,7 +113,7 @@ class OfflineController extends Controller
                     $t = [
                         'meridiem' => $time_obj->format('A') == 'AM' ? '上午' : '下午',
                         'time'     => $time_obj->format('H:i:s'),
-                        'title'    => $i->subject,
+                        'title'    => $i->title,
                         'position' => $i->city. '|' . $i->address,
                         'desc'     => $i->description,
                         'id' => $i->id,
@@ -138,6 +138,11 @@ class OfflineController extends Controller
         $user_id = Redis::get($token);
 
         $myoffline = Offline::where('user_id', $user_id)->get();
+
+        foreach ($myoffline as $meeting) {
+            $meeting->category_id = $meeting->subject;
+            $meeting->cover = 'https:' . config('edu.cdn_domain') . '/' . $meeting->cover;
+        }
 
         return OfflineResource::collection($myoffline);
     }
