@@ -20,8 +20,6 @@ class OfflineController extends Controller
         $file = $request->file('image', '');
         $cover = $this->upload($file, 500);
 
-        Log::info($cover);
-
         $token = $request->token;
         // 从 Redis 中取出用户 ID
         $user_id = Redis::get($token);
@@ -32,8 +30,6 @@ class OfflineController extends Controller
                 'msg'  => 'token expires',
             ];
         }
-        Log::info(1);
-        $city = json_encode($request->city);
 
         if ($request->subject == Offline::SALON) {
             $subject = 1;
@@ -42,13 +38,13 @@ class OfflineController extends Controller
         } else {
             $subject = 3;
         }
-        Log::info(1);
+
         Offline::create([
             'title'       => $request->title,
             'company'     => $request->company,
             'date'        => $request->date,
             'time'        => $request->time,
-            'city'        => $city,
+            'city'        => $request->city,
             'address'     => $request->address,
             'contact'     => $request->contact,
             'phone'       => $request->phone,
@@ -118,8 +114,9 @@ class OfflineController extends Controller
                         'meridiem' => $time_obj->format('A') == 'AM' ? '上午' : '下午',
                         'time'     => $time_obj->format('H:i:s'),
                         'title'    => $i->subject,
-                        'position' => $i->address,
+                        'position' => $i->city. '|' . $i->address,
                         'desc'     => $i->description,
+                        'id' => $i->id,
                     ];
                     $c[] = $t;
                 });
@@ -132,8 +129,6 @@ class OfflineController extends Controller
         });
 
         return $arr;
-
-
     }
 
     public function myOffline(Request $request)
