@@ -140,7 +140,9 @@ class OfflineController extends Controller
         $myoffline = Offline::where('user_id', $user_id)->get();
 
         foreach ($myoffline as $meeting) {
-            $meeting->category_id = $meeting->subject;
+            $category_id = $meeting->subject;
+            $meeting->subject = Offline::CATEGORY[ $category_id ];
+
             $meeting->cover = 'https:' . config('edu.cdn_domain') . '/' . $meeting->cover;
         }
 

@@ -121,7 +121,7 @@ class UserController extends Controller
                 'msg' => 'token expires'
             ];
         }
-        $user = User::withCount('posts')->where('id', $id)->first();
+        $user = User::withCount(['posts', 'comments'])->where('id', $id)->first();
 
         return new UserResource($user);
     }

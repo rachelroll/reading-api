@@ -136,6 +136,21 @@ curl_close($ch);
         ];
     }
 
+    public function totalLikes(Request $request)
+    {
+        $token = $request->token;
+        // 从 Redis 中取出用户 ID
+        $user_id = Redis::get($token);
+
+        $posts = Post::where('user_id', $user_id)->get();
+        $likes_count = 0;
+        foreach ($posts as $post) {
+            $likes_count += $post->like;
+        }
+
+        return $likes_count;
+    }
+
     // 我的所有书评
     public function myPost(Request $request)
     {

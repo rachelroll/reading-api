@@ -23,6 +23,7 @@ class User extends JsonResource
             'post_id' => $this->post_id,
             'age' => $age,
             'posts_count' => $this->posts_count,
+            'comments_count' => $this->comments_count
         ];
     }
 }

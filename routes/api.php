@@ -33,6 +33,7 @@ Route::group(['namespace' => 'Api'], function () {
     Route::get('/post', 'PostController@show');
     // 所有书评
     Route::get('/posts/search', 'PostController@search');
+    Route::get('/posts/total-likes', 'PostController@totalLikes');
 
 
     // 关于用户
