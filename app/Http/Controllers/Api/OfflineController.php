@@ -32,7 +32,6 @@ class OfflineController extends Controller
         }
 
         $date = new Carbon($request->date);
-
         $date = $date->format('Y/m/d');
 
         if ($request->subject == Offline::SALON) {
@@ -48,7 +47,7 @@ class OfflineController extends Controller
             'company'     => $request->company,
             'date'        => $date,
             'time'        => $request->time,
-            'city'        => json_encode($request->city),
+            'city'        => $request->city,
             'address'     => $request->address,
             'contact'     => $request->contact,
             'phone'       => $request->phone,
