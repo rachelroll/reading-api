@@ -57,7 +57,9 @@ class UserController extends Controller
             // 把 session_key 和 openid 存入数据库, 并返回用户 id
             $id = DB::table('users')->insertGetId(
                 ['session_key' => $session_key,
-                 'openid' => $openid]
+                 'openid' => $openid,
+                 'created_at' => now(),
+                'updated_at' => now()]
             );
              // 如果用户储存成功
             if ($id) {
@@ -96,7 +98,7 @@ class UserController extends Controller
         // 根据 ID 找到这个用户, 完善用户信息
         DB::table('users')
             ->where('id', $id)
-            ->update(['nickname' => $nickname, 'avatar' => $avatar]);
+            ->update(['nickname' => $nickname, 'avatar' => $avatar, 'updated_at' => now()]);
 
         return [
             'code' => 200,
@@ -119,7 +121,7 @@ class UserController extends Controller
                 'msg' => 'token expires'
             ];
         }
-        $user = User::withCount('posts')->where('id', $id)->first();
+        $user = User::withCount(['posts', 'comments'])->where('id', $id)->first();
 
         return new UserResource($user);
     }
