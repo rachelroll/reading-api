@@ -31,6 +31,10 @@ class OfflineController extends Controller
             ];
         }
 
+        $date = new Carbon($request->date);
+
+        $date = $date->format('Y/m/d');
+
         if ($request->subject == Offline::SALON) {
             $subject = 1;
         } elseif ($request->subject == Offline::TRAIN) {
@@ -42,7 +46,7 @@ class OfflineController extends Controller
         Offline::create([
             'title'       => $request->title,
             'company'     => $request->company,
-            'date'        => $request->date,
+            'date'        => $date,
             'time'        => $request->time,
             'city'        => json_encode($request->city),
             'address'     => $request->address,

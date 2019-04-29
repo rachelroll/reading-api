@@ -169,7 +169,6 @@ curl_close($ch);
 
         foreach ($posts as &$post) {
             $post->cover = config('edu.cdn_domain').'/'.$post->cover;
-            $post->summary = mb_strcut($post->content, 0, 50,'utf-8');
         }
 
         return PostResource::collection($posts);
